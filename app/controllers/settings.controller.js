@@ -31,7 +31,7 @@ const contactUs = async (req, res) => {
         };
         await contactUsAdmin(sendAdminMailData)
 
-        return res.status(400).send({ status: true, message: "Thank you for your message! We will be in touch with you shortly." });
+        return res.status(200).send({ status: true, message: "Thank you for your message! We will be in touch with you shortly." });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });

@@ -17,7 +17,7 @@ const addBusinessCategory = async (req, res) => {
         const getBusinessCategoryDetails = await BusCategory.getBusinessCategoryData(businessCategoryId);
         if (!getBusinessCategoryDetails.status) return res.status(400).send({ status: false, message: getBusinessCategoryDetails.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Business category added successfully.", data: getBusinessCategoryDetails, });
+        return res.status(200).send({ status: true, message: "Business category added successfully.", data: getBusinessCategoryDetails, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -31,7 +31,7 @@ const getBusinessCategoryList = async (req, res) => {
         const getBusinessCategoryList = await BusCategory.getBusinessCategoryList();
         if (!getBusinessCategoryList.status) return res.status(400).send({ status: false, message: getBusinessCategoryList.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Business category list get successfully", message: getBusinessCategoryList.data, data: {} });
+        return res.status(200).send({ status: true, message: "Business category list get successfully", message: getBusinessCategoryList.data, data: {} });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -46,7 +46,7 @@ const getBusinessCategory = async (req, res) => {
         const getBusinessCategoryData = await BusCategory.getBusinessCategory(bus_cat_id);
         if (!getBusinessCategoryData.status) return res.status(400).send({ status: false, message: getBusinessCategoryData.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Business category get successfully", data: getBusinessCategoryData.data, });
+        return res.status(200).send({ status: true, message: "Business category get successfully", data: getBusinessCategoryData.data, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });

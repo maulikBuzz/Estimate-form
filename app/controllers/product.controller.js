@@ -17,7 +17,7 @@ const addProduct = async (req, res) => {
         const getProductDetails = await Product.getProductData(productId);
         if (!getProductDetails.status) return res.status(400).send({ status: false, message: getProductDetails.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product added successfully.", data: getProductDetails.data });
+        return res.status(200).send({ status: true, message: "Product added successfully.", data: getProductDetails.data });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -32,7 +32,7 @@ const getProductListByBusCat = async (req, res) => {
         const getProductListData = await Product.getProductList(bus_cat_id);
         if (!getProductListData.status) return res.status(400).send({ status: false, message: getProductListData.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product list get successfully", data: getProductListData.data, });
+        return res.status(200).send({ status: true, message: "Product list get successfully", data: getProductListData.data, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -47,7 +47,7 @@ const getProduct = async (req, res) => {
         const getProductList = await Product.getProduct(pro_cat_id);
         if (!getProductList.status) return res.status(400).send({ status: false, message: getProductList.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product get successfully", data: getProductList.data, });
+        return res.status(200).send({ status: true, message: "Product get successfully", data: getProductList.data, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -59,27 +59,49 @@ const addProductVariant = async (req, res) => {
     try {
         const body = req.body;
 
-        let addProductVariantData = ''
         let productId = ''
-        const isExist = await ProductVariant.checkProductVariant(body);
+        const isExist = await ProductVariant.checkProductVariant(body); 
         if (!isExist.status) return res.status(404).send({ status: false, message: isExist.message }); 
-        if (isExist.data[0].deleted_at === 1) {
-            await ProductVariant.checkExistData(body); 
-            productId = isExist.data[0].id; 
+        if (isExist.isExist && isExist.data[0].deleted_at === 1) {
+            await ProductVariant.checkExistAndSaveData(body);
+            productId = isExist.data[0].id;
         } else {
             if (isExist.isExist) return res.status(404).send({ status: false, message: "This Product Variant is already exist. Please try another one." });
 
-            addProductVariantData = await ProductVariant.insertProductVariant(body);
+            const addProductVariantData = await ProductVariant.insertProductVariant(body);
             if (!addProductVariantData.status) return res.status(400).send({ status: false, message: addProductVariantData.message, data: {} });
-            if (!checkExistData.status) return res.status(400).send({ status: false, message: addProductVariantData.message, data: {} });
 
             productId = addProductVariantData.data.insertId;
         }
-           
+
         const getProductVariantDetails = await ProductVariant.getProductVariantData(productId);
         if (!getProductVariantDetails.status) return res.status(400).send({ status: false, message: getProductVariantDetails.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product Variant added successfully.", data: getProductVariantDetails.data });
+        return res.status(200).send({ status: true, message: "Product Variant added successfully.", data: getProductVariantDetails.data });
+    } catch (Err) {
+        console.log(Err);
+        return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
+    }
+} 
+
+const updateProductVariant = async (req, res) => {
+    try {
+        const body = req.body;
+        const { pro_var_id } = req.query
+  
+        const isExist = await ProductVariant.checkProductVariantById(req.query); 
+        if (!isExist.status) return res.status(404).send({ status: false, message: isExist.message });  
+        if (!isExist.isExist) return res.status(404).send({ status: false, message: "This Product Variant is not exist. Please try another one." });
+
+        const data = { name: body.name, id: pro_var_id }
+
+        const updateData = await ProductVariant.updateProductVariant(data);
+        if (!updateData.status) return res.status(400).send({ status: false, message: updateData.message, data: {} });
+  
+        const getProductVariantDetails = await ProductVariant.getProductVariantData(pro_var_id);
+        if (!getProductVariantDetails.status) return res.status(400).send({ status: false, message: getProductVariantDetails.message, data: {} });
+
+        return res.status(200).send({ status: true, message: "Product Variant updated successfully.", data: getProductVariantDetails.data });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -93,7 +115,7 @@ const getProductListByProduct = async (req, res) => {
         const getProductVariantsListData = await ProductVariant.getProductVariantsList(product_id);
         if (!getProductVariantsListData.status) return res.status(400).send({ status: false, message: getProductVariantsListData.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product Variants list get successfully", data: getProductVariantsListData.data, });
+        return res.status(200).send({ status: true, message: "Product Variants list get successfully", data: getProductVariantsListData.data, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -107,7 +129,49 @@ const getProductVariants = async (req, res) => {
         const getProductVariantData = await ProductVariant.getProductVariant(pro_var_id);
         if (!getProductVariantData.status) return res.status(400).send({ status: false, message: getProductVariantData.message, data: {} });
 
-        return res.status(400).send({ status: true, message: "Product get successfully", data: getProductVariantData.data, });
+        return res.status(200).send({ status: true, message: "Product get successfully", data: getProductVariantData.data, });
+    } catch (Err) {
+        console.log(Err);
+        return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
+    }
+}
+
+const deleteProductVariants = async (req, res) => {
+    try {
+        const { pro_var_id } = req.query
+
+        const data = { id: pro_var_id }
+
+        const checkProductVariant = await ProductVariant.checkProductVariantById(data);  
+        if (!checkProductVariant.status) return res.status(404).send({ status: false, message: checkProductVariant.message }); 
+        if (!checkProductVariant.isExist) return res.status(404).send({ status: false, message: "This Product Variant is not exist. Please check product variant." }); 
+
+        const deleteProductVariantData = await ProductVariant.deleteProductVariant(pro_var_id);
+        if (!deleteProductVariantData.status) return res.status(400).send({ status: false, message: deleteProductVariantData.message, data: {} });
+
+        return res.status(200).send({ status: true, message: "Product Variant delete successfully", data: {}, });
+    } catch (Err) {
+        console.log(Err);
+        return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
+    }
+}
+
+const activeInactiveProductVariants = async (req, res) => {
+    try {
+        const { pro_var_id } = req.query
+       
+ 
+        const checkProductVariant = await ProductVariant.checkProductVariantById(req.query);  
+        if (!checkProductVariant.status) return res.status(404).send({ status: false, message: checkProductVariant.message }); 
+        if (!checkProductVariant.isExist) return res.status(404).send({ status: false, message: "This Product Variant is not exist. Please check product variant." }); 
+         
+        const data = { pro_var_id, status: (checkProductVariant.data.status == 1) ? 0 : 1 } 
+        
+        const activeInactiveData = await ProductVariant.activeInactiveProductVariant(data);
+        if (!activeInactiveData.status) return res.status(400).send({ status: false, message: activeInactiveData.message, data: {} });
+        const status = (checkProductVariant.data.status == 0) ? "Active" : "Inactive"
+
+        return res.status(200).send({ status: true, message: `Product Variant ${status} successfully`, data: {}, });
     } catch (Err) {
         console.log(Err);
         return res.status(400).send({ status: false, message: "Something is wrong.Please try again.", data: [], error: Err });
@@ -121,7 +185,10 @@ module.exports = {
     getProduct, 
     addProductVariant,
     getProductListByProduct,
-    getProductVariants
+    getProductVariants,
+    deleteProductVariants,
+    activeInactiveProductVariants,
+    updateProductVariant
 }
     // const demo = async (req, res) => {
     //     try {
